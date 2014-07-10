@@ -3,6 +3,8 @@ package str
 //import "testing"
 import "fmt"
 
+//import "strings"
+
 func ExampleBetween() {
 	eg(1, Between("<a>foo</a>", "<a>", "</a>"))
 	eg(2, Between("<a>foo</a></a>", "<a>", "</a>"))
@@ -41,6 +43,14 @@ func ExampleCamelize() {
 	// 3: MozSomething
 	// 4: CarSpeed
 	// 5: yesWeCan
+}
+
+func ExampleCapitalize() {
+	eg(1, Capitalize("abc"))
+	eg(2, Capitalize("ABC"))
+	// Output:
+	// 1: Abc
+	// 2: Abc
 }
 
 func ExampleCharAt() {
@@ -111,10 +121,20 @@ func ExampleDasherize() {
 	eg(5, Dasherize("ABC"))
 	// Output:
 	// 1: data-rate
-	// 2: car-speed
+	// 2: -car-speed
 	// 3: yes-we-can
 	// 4:
-	// 5: a-b-c
+	// 5: -a-b-c
+}
+
+func ExampleDecodeHTMLEntities() {
+	eg(1, DecodeHTMLEntities("Ken Thompson &amp; Dennis Ritchie"))
+	eg(2, DecodeHTMLEntities("3 &lt; 4"))
+	eg(3, DecodeHTMLEntities("http:&#47;&#47;"))
+	// Output:
+	// 1: Ken Thompson & Dennis Ritchie
+	// 2: 3 < 4
+	// 3: http://
 }
 
 func ExampleEnsurePrefix() {
@@ -149,6 +169,16 @@ func ExampleEnsureSuffix() {
 	// 3:
 	// 4: foo
 	// 5: bar
+}
+
+func ExampleHumanize() {
+	eg(1, Humanize("the_humanize_string_method"))
+	eg(2, Humanize("ThehumanizeStringMethod"))
+	eg(3, Humanize("the humanize string method"))
+	// Output:
+	// 1: The humanize string method
+	// 2: Thehumanize string method
+	// 3: The humanize string method
 }
 
 func ExampleIndexOf() {
@@ -216,16 +246,17 @@ func ExampleIsAlphaNumeric() {
 	// 10: false
 }
 
-// describe('- isEmpty()', function() {
-//  it('should return true if the string is solely composed of whitespace or is null', function() {
-//     T (S(' ').isEmpty());
-//     T (S('\t\t\t    ').isEmpty());
-//     T (S('\n\n ').isEmpty());
-//     F (S('hey').isEmpty())
-//     T (S(null).isEmpty())
-//     T (S(null).isEmpty())
-//   })
-// })
+func ExampleIsEmpty() {
+	eg(1, IsEmpty(" "))
+	eg(2, IsEmpty("\t\t\t   "))
+	eg(3, IsEmpty("\t\n "))
+	eg(4, IsEmpty("hi"))
+	// Output:
+	// 1: true
+	// 2: true
+	// 3: true
+	// 4: false
+}
 
 func ExampleIsLower() {
 	eg(1, IsLower("a"))
@@ -293,35 +324,25 @@ func ExampleIsUpper() {
 	// 9: false
 }
 
-// describe('- isNumeric()', function() {
-//   it("should return true if the string only contains digits, this would not include Infinity or -Infinity", function() {
-//     T (S("3").isNumeric());
-//     F (S("34.22").isNumeric());
-//     F (S("-22.33").isNumeric());
-//     F (S("NaN").isNumeric());
-//     F (S("Infinity").isNumeric());
-//     F (S("-Infinity").isNumeric());
-//     F (S("JP").isNumeric());
-//     F (S("-5").isNumeric());
-//     T (S("000992424242").isNumeric());
-//   })
-// })
-//
-// describe('- isUpper()', function() {
-//   it('should return true if the character or string is uppercase', function() {
-//     F (S('a').isUpper());
-//     F (S('z').isUpper());
-//     T (S('B').isUpper());
-//     T (S('HIJP').isUpper());
-//     T (S('ÁÉÍÓÚÃÕÀÈÌÒÙÂÊÎÔÛÄËÏÖÜÇ').isUpper());
-//     F (S('HI JP').isUpper());
-//     F (S('HelLO').isUpper());
-//     F (S('áéúóúãõàèìòùâêîôûäëïöüç').isUpper());
-//     F (S('áéúóúãõàèìòùâêîôûäëïöüçÁ').isUpper());
-//     F (S('ÁÉÍÓÚÃÕÀÈÌÒÙÂÊÎÔÛÄËÏÖÜÇá').isUpper());
-//   })
-// })
-//
+func ExampleLeft() {
+	eg(1, Left("abcdef", 0))
+	eg(2, Left("abcdef", 1))
+	eg(3, Left("abcdef", 4))
+	eg(4, Left("abcdef", -2))
+	// Output:
+	// 1:
+	// 2: a
+	// 3: abcd
+	// 4: ef
+}
+
+func ExampleLines() {
+	eg(1, Lines("a\r\nb\nc\r\n"))
+	eg(2, Lines("a\r\nb\nc\r\nd"))
+	// Output:
+	// 1: [a b c ]
+	// 2: [a b c d]
+}
 
 func ExampleMatch() {
 	eg(1, Match("foobar", `^fo.*r$`))
@@ -333,8 +354,205 @@ func ExampleMatch() {
 	// 3: false
 }
 
+func ExamplePad() {
+	eg(1, Pad("hello", "x", 5))
+	eg(2, Pad("hello", "x", 10))
+	eg(3, Pad("hello", "x", 11))
+	eg(4, Pad("hello", "x", 6))
+	eg(5, Pad("hello", "x", 1))
+	// Output:
+	// 1: hello
+	// 2: xxxhelloxx
+	// 3: xxxhelloxxx
+	// 4: xhello
+	// 5: hello
+}
+
+func ExamplePadLeft() {
+	eg(1, PadLeft("hello", "x", 5))
+	eg(2, PadLeft("hello", "x", 10))
+	eg(3, PadLeft("hello", "x", 11))
+	eg(4, PadLeft("hello", "x", 6))
+	eg(5, PadLeft("hello", "x", 1))
+	// Output:
+	// 1: hello
+	// 2: xxxxxhello
+	// 3: xxxxxxhello
+	// 4: xhello
+	// 5: hello
+}
+
+func ExamplePadRight() {
+	eg(1, PadRight("hello", "x", 5))
+	eg(2, PadRight("hello", "x", 10))
+	eg(3, PadRight("hello", "x", 11))
+	eg(4, PadRight("hello", "x", 6))
+	eg(5, PadRight("hello", "x", 1))
+	// Output:
+	// 1: hello
+	// 2: helloxxxxx
+	// 3: helloxxxxxx
+	// 4: hellox
+	// 5: hello
+}
+
 func ExamplePipe() {
 	eg(1, Pipe("\nabcdef   \n", Clean, BetweenF("a", "f"), ChompLeftF("bc")))
 	// Output:
 	// 1: de
+}
+
+func ExampleReplaceF() {
+	eg(1, Pipe("abcdefab", ReplaceF("ab", "x", -1)))
+	eg(2, Pipe("abcdefab", ReplaceF("ab", "x", 1)))
+	eg(3, Pipe("abcdefab", ReplaceF("ab", "x", 0)))
+	// Output:
+	// 1: xcdefx
+	// 2: xcdefab
+	// 3: abcdefab
+}
+
+func ExampleReplacePattern() {
+	eg(1, ReplacePattern("aabbcc", `a`, "x"))
+	// Output:
+	// 1: xxbbcc
+}
+
+func ExampleReplacePatternF() {
+	eg(1, Pipe("aabbcc", ReplacePatternF(`a`, "x")))
+	// Output:
+	// 1: xxbbcc
+}
+
+func ExampleReverse() {
+	eg(1, Reverse("abc"))
+	eg(2, Reverse("中文"))
+	// Output:
+	// 1: cba
+	// 2: 文中
+}
+
+func ExampleTemplateWithDelimiters() {
+	eg(1, TemplateWithDelimiters("Hello {{name}} at {{date-year}}", map[string]interface{}{"name": "foo", "date-year": 2014}, "{{", "}}"))
+	eg(2, TemplateWithDelimiters("Hello #{name} at #{date-year}", map[string]interface{}{"name": "foo", "date-year": 2014}, "#{", "}"))
+	eg(3, TemplateWithDelimiters("Hello (name) at (date-year)", map[string]interface{}{"name": "foo", "date-year": 2014}, "(", ")"))
+	eg(4, TemplateWithDelimiters("Hello [name] at [date-year]", map[string]interface{}{"name": "foo", "date-year": 2014}, "[", "]"))
+	eg(5, TemplateWithDelimiters("Hello *name* at *date-year*", map[string]interface{}{"name": "foo", "date-year": 2014}, "*", "*"))
+	eg(6, TemplateWithDelimiters("Hello $name$ at $date-year$", map[string]interface{}{"name": "foo", "date-year": 2014}, "$", "$"))
+	// Output:
+	// 1: Hello foo at 2014
+	// 2: Hello foo at 2014
+	// 3: Hello foo at 2014
+	// 4: Hello foo at 2014
+	// 5: Hello foo at 2014
+	// 6: Hello foo at 2014
+}
+
+func ExampleTemplate() {
+	eg(1, Template("Hello {{name}} at {{date-year}}", map[string]interface{}{"name": "foo", "date-year": 2014}))
+	eg(2, Template("Hello {{name}}", map[string]interface{}{"name": ""}))
+	SetTemplateDelimiters("{", "}")
+	eg(3, Template("Hello {name} at {date-year}", map[string]interface{}{"name": "foo", "date-year": 2014}))
+	// Output:
+	// 1: Hello foo at 2014
+	// 2: Hello
+	// 3: Hello foo at 2014
+}
+
+func ExampleSlugify() {
+	eg(1, Slugify("foo bar"))
+	eg(2, Slugify("foo/bar bah"))
+	eg(3, Slugify("foo-bar--bah"))
+	// Output:
+	// 1: foo-bar
+	// 2: foobar-bah
+	// 3: foo-bar-bah
+}
+
+func ExampleStripPunctuation() {
+	eg(1, StripPunctuation("My, st[ring] *full* of %punct)"))
+	// Output:
+	// 1: My string full of punct
+}
+
+func ExampleStripTags() {
+	eg(1, StripTags("<p>just <b>some</b> text</p>"))
+	eg(2, StripTags("<p>just <b>some</b> text</p>", "p"))
+	eg(3, StripTags("<a><p>just <b>some</b> text</p></a>", "a", "p"))
+	eg(4, StripTags("<a><p>just <b>some</b> text</p></a>", "b"))
+	// Output:
+	// 1: just some text
+	// 2: just <b>some</b> text
+	// 3: just <b>some</b> text
+	// 4: <a><p>just some text</p></a>
+}
+
+func ExampleSubstr() {
+	eg(1, Substr("abcdef", 2, -1))
+	eg(2, Substr("abcdef", 2, 0))
+	eg(3, Substr("abcdef", 2, 1))
+	eg(4, Substr("abcdef", 2, 3))
+	eg(5, Substr("abcdef", 2, 4))
+	eg(6, Substr("abcdef", 2, 100))
+	eg(7, Substr("abcdef", 0, 1))
+	// Output:
+	// 1:
+	// 2:
+	// 3: c
+	// 4: cde
+	// 5: cdef
+	// 6: cdef
+	// 7: a
+}
+
+func ExampleToBool() {
+	eg(1, ToBool("true"))
+	eg(2, ToBool("yes"))
+	eg(3, ToBool("1"))
+	eg(4, ToBool("on"))
+	eg(5, ToBool("false"))
+	eg(6, ToBool("no"))
+	eg(7, ToBool("0"))
+	eg(8, ToBool("off"))
+	eg(9, ToBool(""))
+	eg(10, ToBool("?"))
+	// Output:
+	// 1: true
+	// 2: true
+	// 3: true
+	// 4: true
+	// 5: false
+	// 6: false
+	// 7: false
+	// 8: false
+	// 9: false
+	// 10: false
+}
+
+func ExampleUnderscore() {
+	eg(1, Underscore("fooBar"))
+	eg(2, Underscore("FooBar"))
+	eg(3, Underscore(""))
+	eg(4, Underscore("x"))
+	// Output:
+	// 1: foo_bar
+	// 2: _foo_bar
+	// 3:
+	// 4: x
+}
+
+func ExampleWrapHTML() {
+	eg(1, WrapHTML("foo", "span", nil))
+	eg(2, WrapHTML("foo", "", nil))
+	eg(3, WrapHTML("foo", "", map[string]string{"class": "bar"}))
+	// Output:
+	// 1: <span>foo</span>
+	// 2: <div>foo</div>
+	// 3: <div class="bar">foo</div>
+}
+
+func ExampleWrapHTMLF() {
+	eg(1, Pipe("foo", WrapHTMLF("div", nil)))
+	// Output:
+	// 1: <div>foo</div>
 }
