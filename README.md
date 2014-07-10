@@ -2,7 +2,7 @@
 
 Go string library to build more awesomeness.
 
-See [godoc](https://godoc.org/github.com/mgutz/gosu)
+See [godoc](https://godoc.org/github.com/mgutz/str)
 
 ## About
 
