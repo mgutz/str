@@ -3,298 +3,14 @@ package str
 import (
 	"fmt"
 	"html"
-	"log"
+	//"log"
 	"math"
 	"regexp"
+	"runtime"
+	"strconv"
 	"strings"
 	"unicode/utf8"
 )
-
-// Verbose flag enables console output for those functions that have
-// counterparts in Go's excellent stadard packages.
-var Verbose = false
-var templateOpen = "{{"
-var templateClose = "}}"
-
-var beginEndSpacesRe = regexp.MustCompile("^\\s+|\\s+$")
-var camelizeRe = regexp.MustCompile(`(\-|_|\s)+(.)?`)
-var camelizeRe2 = regexp.MustCompile(`(\-|_|\s)+`)
-var capitalsRe = regexp.MustCompile("([A-Z])")
-var dashSpaceRe = regexp.MustCompile(`[-\s]+`)
-var dashesRe = regexp.MustCompile("-+")
-var isAlphaNumericRe = regexp.MustCompile(`[^0-9a-z\xC0-\xFF]`)
-var isAlphaRe = regexp.MustCompile(`[^a-z\xC0-\xFF]`)
-var nWhitespaceRe = regexp.MustCompile(`\s+`)
-var notDigitsRe = regexp.MustCompile(`[^0-9]`)
-var slugifyRe = regexp.MustCompile(`[^\w\s\-]`)
-var spaceUnderscoreRe = regexp.MustCompile("[_\\s]+")
-var spacesRe = regexp.MustCompile("[\\s\\xA0]+")
-var stripPuncRe = regexp.MustCompile(`[^\w\s]|_`)
-var templateRe = regexp.MustCompile(`([\-\[\]()*\s])`)
-var templateRe2 = regexp.MustCompile(`\$`)
-var underscoreRe = regexp.MustCompile(`([a-z\d])([A-Z]+)`)
-var whitespaceRe = regexp.MustCompile(`^[\s\xa0]*$`)
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-// Between extracts a string between left and right strings.
-func Between(s, left, right string) string {
-	l := len(left)
-	startPos := strings.Index(s, left)
-	endPos := IndexOf(s, right, startPos+l)
-	//log.Printf("%s: left %s right %s start %d end %d", s, left, right, startPos+l, endPos)
-	if endPos < 0 {
-		return ""
-	} else if right == "" {
-		return s[endPos:]
-	} else {
-		return s[startPos+l : endPos]
-	}
-}
-
-// BetweenF is the filter form for Between.
-func BetweenF(left, right string) func(string) string {
-	return func(s string) string {
-		return Between(s, left, right)
-	}
-}
-
-// Camelize return new string which removes any underscores or dashes and convert a string into camel casing.
-func Camelize(s string) string {
-	return camelizeRe.ReplaceAllStringFunc(s, func(val string) string {
-		val = strings.ToUpper(val)
-		val = camelizeRe2.ReplaceAllString(val, "")
-		return val
-	})
-}
-
-// Capitalize uppercases the first char of s and lowercases the rest.
-func Capitalize(s string) string {
-	return strings.ToUpper(s[0:1]) + strings.ToLower(s[1:])
-}
-
-// CharAt returns a string from the character at the specified position.
-func CharAt(s string, index int) string {
-	l := len(s)
-	shortcut := index < 0 || index > l-1 || l == 0
-	if shortcut {
-		return ""
-	}
-	return s[index : index+1]
-}
-
-// CharAtF is the filter form of CharAt.
-func CharAtF(index int) func(string) string {
-	return func(s string) string {
-		return CharAt(s, index)
-	}
-}
-
-// ChompLeft removes prefix at the start of a string.
-func ChompLeft(s, prefix string) string {
-	if strings.HasPrefix(s, prefix) {
-		return s[len(prefix):]
-	}
-	return s
-}
-
-// ChompLeftF is the filter form of ChompLeft.
-func ChompLeftF(prefix string) func(string) string {
-	return func(s string) string {
-		return ChompLeft(s, prefix)
-	}
-}
-
-// ChompRight removes suffix from end of s.
-func ChompRight(s, suffix string) string {
-	if strings.HasSuffix(s, suffix) {
-		return s[:len(s)-len(suffix)]
-	}
-	return s
-}
-
-// ChompRightF is the filter form of ChompRight.
-func ChompRightF(suffix string) func(string) string {
-	return func(s string) string {
-		return ChompRight(s, suffix)
-	}
-}
-
-// Clean compresses all adjacent whitespace to a single space and trims s.
-func Clean(s string) string {
-	s = spacesRe.ReplaceAllString(s, " ")
-	s = beginEndSpacesRe.ReplaceAllString(s, "")
-	return s
-}
-
-// Dasherize  converts a camel cased string into a string delimited by dashes.
-func Dasherize(s string) string {
-	s = strings.TrimSpace(s)
-	s = spaceUnderscoreRe.ReplaceAllString(s, "-")
-	s = capitalsRe.ReplaceAllString(s, "-$1")
-	s = dashesRe.ReplaceAllString(s, "-")
-	s = strings.ToLower(s)
-	return s
-}
-
-// EscapeHTML is alias for html.EscapeString.
-func EscapeHTML(s string) string {
-	if Verbose {
-		fmt.Println("Use html.EscapeString instead of EscapeHTML")
-	}
-	return html.EscapeString(s)
-}
-
-// DecodeHTMLEntities decodes HTML entities into their proper string representation.
-// DecodeHTMLEntities is an alias for html.UnescapeString
-func DecodeHTMLEntities(s string) string {
-	if Verbose {
-		fmt.Println("Use html.UnescapeString instead of DecodeHTMLEntities")
-	}
-	return html.UnescapeString(s)
-}
-
-// EnsurePrefix ensures s starts with prefix.
-func EnsurePrefix(s, prefix string) string {
-	if strings.HasPrefix(s, prefix) {
-		return s
-	}
-	return prefix + s
-}
-
-// EnsurePrefixF is the filter form of EnsurePrefix.
-func EnsurePrefixF(prefix string) func(string) string {
-	return func(s string) string {
-		return EnsurePrefix(s, prefix)
-	}
-}
-
-// EnsureSuffix ensures s ends with suffix.
-func EnsureSuffix(s, suffix string) string {
-	if strings.HasSuffix(s, suffix) {
-		return s
-	}
-	return s + suffix
-}
-
-// EnsureSuffixF is the filter version of EnsureSuffix.
-func EnsureSuffixF(suffix string) func(string) string {
-	return func(s string) string {
-		return EnsureSuffix(s, suffix)
-	}
-}
-
-// Humanize transforms s into a human friendly form.
-func Humanize(s string) string {
-	if s == "" {
-		return s
-	}
-	s = Underscore(s)
-	log.Printf("hum %s\n", s)
-
-	var humanizeRe = regexp.MustCompile(`_id$`)
-	s = humanizeRe.ReplaceAllString(s, "")
-	log.Printf("hum %s\n", s)
-
-	s = strings.Replace(s, "_", " ", -1)
-	s = strings.TrimSpace(s)
-	s = Capitalize(s)
-	return s
-}
-
-// IndexOf finds the index of needle in s starting from start.
-func IndexOf(s string, needle string, start int) int {
-	l := len(s)
-	if needle == "" {
-		if start < 0 {
-			return 0
-		} else if start < l {
-			return start
-		} else {
-			return l
-		}
-	}
-	if start < 0 || start > l-1 {
-		return -1
-	}
-	pos := strings.Index(s[start:], needle)
-	if pos == -1 {
-		return -1
-	}
-	return start + pos
-}
-
-// IsAlpha returns true if a string contains only letters from ASCII (a-z,A-Z). Other letters from other languages are not supported.
-func IsAlpha(s string) bool {
-	return !isAlphaRe.MatchString(strings.ToLower(s))
-}
-
-// IsAlphaNumeric returns true if a string contains letters and digits.
-func IsAlphaNumeric(s string) bool {
-	return !isAlphaNumericRe.MatchString(strings.ToLower(s))
-}
-
-// IsLower returns true if s comprised of all lower case characters.
-func IsLower(s string) bool {
-	return IsAlpha(s) && s == strings.ToLower(s)
-}
-
-// IsNumeric returns true if a string contains only digits from 0-9. Other digits not in Latin (such as Arabic) are not currently supported.
-func IsNumeric(s string) bool {
-	return !notDigitsRe.MatchString(s)
-}
-
-// IsUpper returns true if s contains all upper case chracters.
-func IsUpper(s string) bool {
-	return IsAlpha(s) && s == strings.ToUpper(s)
-}
-
-// IsEmpty returns true if the string is solely composed of whitespace.
-func IsEmpty(s string) bool {
-	if s == "" {
-		return true
-	}
-	return whitespaceRe.MatchString(s)
-}
-
-// Left returns the left substring of length n.
-func Left(s string, n int) string {
-	if n < 0 {
-		return Right(s, -n)
-	}
-	return Substr(s, 0, n)
-}
-
-// LeftF is the filter version of Left.
-func LeftF(n int) func(string) string {
-	return func(s string) string {
-		return Left(s, n)
-	}
-}
-
-// Lines convert windows newlines to unix newlines then convert to an Array of lines.
-func Lines(s string) []string {
-	s = strings.Replace(s, "\r\n", "\n", -1)
-	return strings.Split(s, "\n")
-}
-
-// Match returns true if patterns matches the string
-func Match(s, pattern string) bool {
-	r := regexp.MustCompile(pattern)
-	return r.MatchString(s)
-}
 
 // Pad pads string s on both sides until it has length of n.
 func Pad(s, c string, n int) string {
@@ -354,6 +70,13 @@ func Pipe(s string, funcs ...func(string) string) string {
 		s = fn(s)
 	}
 	return s
+}
+
+// QuoteItems quotes all items in array, mostly for debugging.
+func QuoteItems(arr []string) []string {
+	return Map(arr, func(s string) string {
+		return strconv.Quote(s)
+	})
 }
 
 // ReplaceF is the filter version of strings.Replace.
@@ -584,12 +307,8 @@ func Underscore(s string) string {
 	u := strings.TrimSpace(s)
 
 	u = underscoreRe.ReplaceAllString(u, "${1}_$2")
-	log.Printf("trim %s\n", u)
 	u = dashSpaceRe.ReplaceAllString(u, "_")
-	log.Printf("trim2 %s\n", u)
 	u = strings.ToLower(u)
-	log.Printf("trim3 %s\n", u)
-	log.Printf("trimx %s\n", s[0:1])
 	if IsUpper(s[0:1]) {
 		return "_" + u
 	}
@@ -628,4 +347,113 @@ func WrapHTMLF(tag string, attrs map[string]string) func(string) string {
 	return func(s string) string {
 		return WrapHTML(s, tag, attrs)
 	}
+}
+
+// ToArgv converts a s into an argv for exec.
+func ToArgv(s string) []string {
+	const (
+		InArg = iota
+		InArgQuote
+		OutOfArg
+	)
+	currentState := OutOfArg
+	currentQuoteChar := "\x00" // to distinguish between ' and " quotations
+	// this allows to use "foo'bar"
+	currentArg := ""
+	argv := []string{}
+
+	L := len(s)
+	for i := 0; i < L; i++ {
+		c := s[i : i+1]
+
+		//fmt.Printf("c %s state %v arg %s argv %v i %d\n", c, currentState, currentArg, args, i)
+		if isQuote(c) {
+			switch currentState {
+			case OutOfArg:
+				currentArg = ""
+				fallthrough
+			case InArg:
+				currentState = InArgQuote
+				currentQuoteChar = c
+
+			case InArgQuote:
+				if c == currentQuoteChar {
+					currentState = InArg
+				} else {
+					currentArg += c
+				}
+			}
+
+		} else if isWhitespace(c) {
+			switch currentState {
+			case InArg:
+				argv = append(argv, currentArg)
+				currentState = OutOfArg
+			case InArgQuote:
+				currentArg += c
+			case OutOfArg:
+				// nothing
+			}
+
+		} else if isEscape(c) {
+			switch currentState {
+			case OutOfArg:
+				currentArg = ""
+				currentState = InArg
+				fallthrough
+			case InArg:
+				fallthrough
+			case InArgQuote:
+				if i == L-1 {
+					if runtime.GOOS == "windows" {
+						// just add \ to end for windows
+						currentArg += c
+					} else {
+						panic("Escape character at end string")
+					}
+				} else {
+					if runtime.GOOS == "windows" {
+						peek := s[i+1 : i+2]
+						if peek != `"` {
+							currentArg += c
+						}
+					} else {
+						i++
+						c = s[i : i+1]
+						currentArg += c
+					}
+				}
+			}
+		} else {
+			switch currentState {
+			case InArg, InArgQuote:
+				currentArg += c
+
+			case OutOfArg:
+				currentArg = ""
+				currentArg += c
+				currentState = InArg
+			}
+		}
+	}
+
+	if currentState == InArg {
+		argv = append(argv, currentArg)
+	} else if currentState == InArgQuote {
+		panic("Starting quote has no ending quote.")
+	}
+
+	return argv
+}
+
+func isQuote(c string) bool {
+	return c == `"` || c == "''"
+}
+
+func isEscape(c string) bool {
+	return c == `\`
+}
+
+func isWhitespace(c string) bool {
+	return c == " " || c == "\t"
 }

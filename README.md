@@ -240,6 +240,13 @@ func Lines(s string) []string
 Lines convert windows newlines to unix newlines then convert to an Array of
 lines.
 
+#### func  Map
+
+```go
+func Map(arr []string, iterator func(string) string) []string
+```
+Map maps an array's iitem through an iterator.
+
 #### func  Match
 
 ```go
@@ -295,6 +302,13 @@ PadRightF is the filter version of Padright
 func Pipe(s string, funcs ...func(string) string) string
 ```
 Pipe pipes s through one or more string filters.
+
+#### func  QuoteItems
+
+```go
+func QuoteItems(arr []string) []string
+```
+QuoteItems quotes all items in array, mostly for debugging.
 
 #### func  ReplaceF
 
@@ -423,6 +437,13 @@ func TemplateWithDelimiters(s string, values map[string]interface{}, opening, cl
 ```
 TemplateWithDelimiters is string template with user-defineable opening and
 closing delimiters.
+
+#### func  ToArgv
+
+```go
+func ToArgv(s string) []string
+```
+ToArgv converts a s into an argv for exec.
 
 #### func  ToBool
 

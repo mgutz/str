@@ -505,6 +505,16 @@ func ExampleSubstr() {
 	// 7: a
 }
 
+func ExampleToArgv() {
+	eg(1, QuoteItems(ToArgv(`GO_ENV=test gosu --watch foo@release "some quoted string 'inside'"`)))
+	eg(2, QuoteItems(ToArgv(`gosu foo\ bar`)))
+	eg(3, QuoteItems(ToArgv(`gosu --test="some arg" -w -s a=123`)))
+	// Output:
+	// 1: ["GO_ENV=test" "gosu" "--watch" "foo@release" "some quoted string 'inside'"]
+	// 2: ["gosu" "foo bar"]
+	// 3: ["gosu" "--test=some arg" "-w" "-s" "a=123"]
+}
+
 func ExampleToBool() {
 	eg(1, ToBool("true"))
 	eg(2, ToBool("yes"))

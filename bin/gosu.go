@@ -5,6 +5,7 @@ import (
 	"github.com/mgutz/gosu/util"
 )
 
+// Project is local project.
 func Project(p *gosu.Project) {
 	p.Task("default", []string{"readme"})
 
