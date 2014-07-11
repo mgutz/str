@@ -12,7 +12,7 @@ import (
 	"unicode/utf8"
 )
 
-// Pad pads string s on both sides until it has length of n.
+// Pad pads string s on both sides with c until it has length of n.
 func Pad(s, c string, n int) string {
 	L := len(s)
 	if L >= n {
@@ -25,14 +25,14 @@ func Pad(s, c string, n int) string {
 	return left + s + right
 }
 
-// PadF is the filter version of Pad.
+// PadF is the filter form of Pad.
 func PadF(c string, n int) func(string) string {
 	return func(s string) string {
 		return Pad(s, c, n)
 	}
 }
 
-// PadLeft pads string s on left side until it has length of n.
+// PadLeft pads string s on left side with n until it has length of n.
 func PadLeft(s, c string, n int) string {
 	L := len(s)
 	if L > n {
@@ -41,7 +41,7 @@ func PadLeft(s, c string, n int) string {
 	return strings.Repeat(c, (n-L)) + s
 }
 
-// PadLeftF is the filter version of PadLeft.
+// PadLeftF is the filter form of PadLeft.
 func PadLeftF(c string, n int) func(string) string {
 	return func(s string) string {
 		return PadLeft(s, c, n)
@@ -57,7 +57,7 @@ func PadRight(s, c string, n int) string {
 	return s + strings.Repeat(c, (n-L))
 }
 
-// PadRightF is the filter version of Padright
+// PadRightF is the filter form of Padright
 func PadRightF(c string, n int) func(string) string {
 	return func(s string) string {
 		return PadRight(s, c, n)
@@ -79,7 +79,7 @@ func QuoteItems(arr []string) []string {
 	})
 }
 
-// ReplaceF is the filter version of strings.Replace.
+// ReplaceF is the filter form of strings.Replace.
 func ReplaceF(old, new string, n int) func(string) string {
 	return func(s string) string {
 		return strings.Replace(s, old, new, n)
@@ -93,7 +93,7 @@ func ReplacePattern(s, pattern, repl string) string {
 	return r.ReplaceAllString(s, repl)
 }
 
-// ReplacePatternF is the filter version of ReplaceRegexp.
+// ReplacePatternF is the filter form of ReplaceRegexp.
 func ReplacePatternF(pattern, repl string) func(string) string {
 	return func(s string) string {
 		return ReplacePattern(s, pattern, repl)
@@ -124,6 +124,12 @@ func RightF(n int) func(string) string {
 	return func(s string) string {
 		return Right(s, n)
 	}
+}
+
+// SetTemplateDelimiters sets the delimiters for Template function. Defaults to "{{" and "}}"
+func SetTemplateDelimiters(opening, closing string) {
+	templateOpen = opening
+	templateClose = closing
 }
 
 // Slice slices a string. If end is negative then it is the from the end
@@ -162,7 +168,7 @@ func Substr(s string, index int, n int) string {
 	return s[index:end]
 }
 
-// SubstrF is the filter version of Substr.
+// SubstrF is the filter form of Substr.
 func SubstrF(index, n int) func(string) string {
 	return func(s string) string {
 		return Substr(s, index, n)
@@ -196,14 +202,28 @@ func StripTags(s string, tags ...string) string {
 	return s
 }
 
+// Template is a string template which replaces template placeholders delimited
+// by "{{" and "}}" with values from map. The global delimiters may be set with
+// SetTemplateDelimiters.
+func Template(s string, values map[string]interface{}) string {
+	return TemplateWithDelimiters(s, values, templateOpen, templateClose)
+}
+
+// TemplateDelimiters is the getter for the opening and closing delimiters for Template.
+func TemplateDelimiters() (opening string, closing string) {
+	return templateOpen, templateClose
+}
+
 // TemplateWithDelimiters is string template with user-defineable opening and closing delimiters.
 func TemplateWithDelimiters(s string, values map[string]interface{}, opening, closing string) string {
-	openDelim := templateRe.ReplaceAllString(opening, "\\$1")
-	openDelim = templateRe2.ReplaceAllString(openDelim, "\\$")
-	closingDelim := templateRe.ReplaceAllString(closing, "\\$1")
-	closingDelim = templateRe2.ReplaceAllString(closingDelim, "\\$")
+	escapeDelimiter := func(delim string) string {
+		result := templateRe.ReplaceAllString(delim, "\\$1")
+		return templateRe2.ReplaceAllString(result, "\\$")
+	}
 
-	r := regexp.MustCompile(openDelim + `(.+?)` + closingDelim)
+	openingDelim := escapeDelimiter(opening)
+	closingDelim := escapeDelimiter(closing)
+	r := regexp.MustCompile(openingDelim + `(.+?)` + closingDelim)
 	matches := r.FindAllStringSubmatch(s, -1)
 	for _, submatches := range matches {
 		match := submatches[0]
@@ -218,22 +238,113 @@ func TemplateWithDelimiters(s string, values map[string]interface{}, opening, cl
 	return s
 }
 
-// SetTemplateDelimiters sets the delimiters for Template function. Defaults to "{{" and "}}"
-func SetTemplateDelimiters(opening, closing string) {
-	templateOpen = opening
-	templateClose = closing
-}
+// ToArgv converts string s into an argv for exec.
+func ToArgv(s string) []string {
+	const (
+		InArg = iota
+		InArgQuote
+		OutOfArg
+	)
+	currentState := OutOfArg
+	currentQuoteChar := "\x00" // to distinguish between ' and " quotations
+	// this allows to use "foo'bar"
+	currentArg := ""
+	argv := []string{}
 
-// TemplateDelimiters is the getter for the opening and closing delimiters for Template.
-func TemplateDelimiters() (opening string, closing string) {
-	return templateOpen, templateClose
-}
+	isQuote := func(c string) bool {
+		return c == `"` || c == `'`
+	}
 
-// Template is a string template which replaces template placeholders delimited
-// by "{{" and "}}" with values from map. The global delimiters may be set with
-// SetTemplateDelimiters.
-func Template(s string, values map[string]interface{}) string {
-	return TemplateWithDelimiters(s, values, templateOpen, templateClose)
+	isEscape := func(c string) bool {
+		return c == `\`
+	}
+
+	isWhitespace := func(c string) bool {
+		return c == " " || c == "\t"
+	}
+
+	L := len(s)
+	for i := 0; i < L; i++ {
+		c := s[i : i+1]
+
+		//fmt.Printf("c %s state %v arg %s argv %v i %d\n", c, currentState, currentArg, args, i)
+		if isQuote(c) {
+			switch currentState {
+			case OutOfArg:
+				currentArg = ""
+				fallthrough
+			case InArg:
+				currentState = InArgQuote
+				currentQuoteChar = c
+
+			case InArgQuote:
+				if c == currentQuoteChar {
+					currentState = InArg
+				} else {
+					currentArg += c
+				}
+			}
+
+		} else if isWhitespace(c) {
+			switch currentState {
+			case InArg:
+				argv = append(argv, currentArg)
+				currentState = OutOfArg
+			case InArgQuote:
+				currentArg += c
+			case OutOfArg:
+				// nothing
+			}
+
+		} else if isEscape(c) {
+			switch currentState {
+			case OutOfArg:
+				currentArg = ""
+				currentState = InArg
+				fallthrough
+			case InArg:
+				fallthrough
+			case InArgQuote:
+				if i == L-1 {
+					if runtime.GOOS == "windows" {
+						// just add \ to end for windows
+						currentArg += c
+					} else {
+						panic("Escape character at end string")
+					}
+				} else {
+					if runtime.GOOS == "windows" {
+						peek := s[i+1 : i+2]
+						if peek != `"` {
+							currentArg += c
+						}
+					} else {
+						i++
+						c = s[i : i+1]
+						currentArg += c
+					}
+				}
+			}
+		} else {
+			switch currentState {
+			case InArg, InArgQuote:
+				currentArg += c
+
+			case OutOfArg:
+				currentArg = ""
+				currentArg += c
+				currentState = InArg
+			}
+		}
+	}
+
+	if currentState == InArg {
+		argv = append(argv, currentArg)
+	} else if currentState == InArgQuote {
+		panic("Starting quote has no ending quote.")
+	}
+
+	return argv
 }
 
 // ToBool fuzzily converts truthy values.
@@ -342,118 +453,9 @@ func WrapHTML(s string, tag string, attrs map[string]string) string {
 	return el
 }
 
-// WrapHTMLF is the filter version of WrapHTML
+// WrapHTMLF is the filter form of WrapHTML.
 func WrapHTMLF(tag string, attrs map[string]string) func(string) string {
 	return func(s string) string {
 		return WrapHTML(s, tag, attrs)
 	}
-}
-
-// ToArgv converts a s into an argv for exec.
-func ToArgv(s string) []string {
-	const (
-		InArg = iota
-		InArgQuote
-		OutOfArg
-	)
-	currentState := OutOfArg
-	currentQuoteChar := "\x00" // to distinguish between ' and " quotations
-	// this allows to use "foo'bar"
-	currentArg := ""
-	argv := []string{}
-
-	L := len(s)
-	for i := 0; i < L; i++ {
-		c := s[i : i+1]
-
-		//fmt.Printf("c %s state %v arg %s argv %v i %d\n", c, currentState, currentArg, args, i)
-		if isQuote(c) {
-			switch currentState {
-			case OutOfArg:
-				currentArg = ""
-				fallthrough
-			case InArg:
-				currentState = InArgQuote
-				currentQuoteChar = c
-
-			case InArgQuote:
-				if c == currentQuoteChar {
-					currentState = InArg
-				} else {
-					currentArg += c
-				}
-			}
-
-		} else if isWhitespace(c) {
-			switch currentState {
-			case InArg:
-				argv = append(argv, currentArg)
-				currentState = OutOfArg
-			case InArgQuote:
-				currentArg += c
-			case OutOfArg:
-				// nothing
-			}
-
-		} else if isEscape(c) {
-			switch currentState {
-			case OutOfArg:
-				currentArg = ""
-				currentState = InArg
-				fallthrough
-			case InArg:
-				fallthrough
-			case InArgQuote:
-				if i == L-1 {
-					if runtime.GOOS == "windows" {
-						// just add \ to end for windows
-						currentArg += c
-					} else {
-						panic("Escape character at end string")
-					}
-				} else {
-					if runtime.GOOS == "windows" {
-						peek := s[i+1 : i+2]
-						if peek != `"` {
-							currentArg += c
-						}
-					} else {
-						i++
-						c = s[i : i+1]
-						currentArg += c
-					}
-				}
-			}
-		} else {
-			switch currentState {
-			case InArg, InArgQuote:
-				currentArg += c
-
-			case OutOfArg:
-				currentArg = ""
-				currentArg += c
-				currentState = InArg
-			}
-		}
-	}
-
-	if currentState == InArg {
-		argv = append(argv, currentArg)
-	} else if currentState == InArgQuote {
-		panic("Starting quote has no ending quote.")
-	}
-
-	return argv
-}
-
-func isQuote(c string) bool {
-	return c == `"` || c == "''"
-}
-
-func isEscape(c string) bool {
-	return c == `\`
-}
-
-func isWhitespace(c string) bool {
-	return c == " " || c == "\t"
 }

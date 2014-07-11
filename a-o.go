@@ -187,7 +187,7 @@ func EnsureSuffix(s, suffix string) string {
 	return s + suffix
 }
 
-// EnsureSuffixF is the filter version of EnsureSuffix.
+// EnsureSuffixF is the filter form of EnsureSuffix.
 func EnsureSuffixF(suffix string) func(string) string {
 	return func(s string) string {
 		return EnsureSuffix(s, suffix)
@@ -271,7 +271,7 @@ func Left(s string, n int) string {
 	return Substr(s, 0, n)
 }
 
-// LeftF is the filter version of Left.
+// LeftF is the filter form of Left.
 func LeftF(n int) func(string) string {
 	return func(s string) string {
 		return Left(s, n)
