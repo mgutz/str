@@ -1,9 +1,3 @@
-// Credits:
-// https://github.com/jprichardson/string.js
-// https://github.com/anbinh/dna/blob/master/string.go
-
-// Package str is a set of useful string helpers which can be composed
-// into a pipeline.
 package str
 
 import (
