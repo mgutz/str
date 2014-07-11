@@ -1,24 +1,24 @@
 // Package str is a comprehensive set of string functions to build more
-// awesomeness. Str is a port of many of the functions from the JavaScript
-// [string.js](http://stringjs.com), which includes my contributions to
-// the project.
+// awesomeness in Go. Str is a port of the JavaScript [string.js](http://stringjs.com),
+// including my contributions to the project.
 //
-// Package str differs from string.js in that str is based on simple functions
-// not an intermediate String object to be consistent with Go.
+// Str does not duplicate functionality found in `strings` or `strconv`. Str
+// may add filter versions of functions found in those packages for use with
+// Pipe.
 //
-//      str.Between("<a>foo</a>", "<a>", "</a>") == "foo"
+// Str is based on simple functions not an intermediate String object to be
+// more consistent with the standard libraries Go.
 //
-// Package str is designed to be pipelined.
+//      // "foo"
+//      str.Between("<a>foo</a>", "<a>", "</a>")
 //
-//      s := str.Pipe(
-//          "\nabcdef\n",
-//          Clean,
-//          BetweenF("a", "f"),
-//          ChompLeftF("bc")
-//      ) // "de"
+// Str is designed to be pipelined.
 //
-// User defined filters can be added to the pipeline if they have a signature
-// of
+//      // "de"
+//      s := str.Pipe("\nabcdef\n", Clean, BetweenF("a", "f"), ChompLeftF("bc"))
+//
+// User-defined filters can be added to the pipeline by creating a function
+// or closure that returns a function with this signature
 //
 //      func(string) string
 //

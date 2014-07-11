@@ -525,41 +525,44 @@ func ToBool(s string) bool {
 	return s == "true" || s == "yes" || s == "on" || s == "1"
 }
 
+// TODO This is not working yet. Go's regexp package does not have some
+// of the niceities in JavaScript
+//
 // Truncate truncates the string, accounting for word placement and chars count
 // adding a morestr (defaults to ellipsis)
-func Truncate(s, morestr string, n int) string {
-	L := len(s)
-	if L <= n {
-		return s
-	}
-
-	if morestr == "" {
-		morestr = "..."
-	}
-
-	tmpl := func(c string) string {
-		if strings.ToUpper(c) != strings.ToLower(c) {
-			return "A"
-		}
-		return " "
-	}
-	template := s[0 : n+1]
-	var truncateRe = regexp.MustCompile(`.(?=\W*\w*$)`)
-	truncateRe.ReplaceAllStringFunc(template, tmpl) // 'Hello, world' -> 'HellAA AAAAA'
-	var wwRe = regexp.MustCompile(`\w\w`)
-	var whitespaceRe2 = regexp.MustCompile(`\s*\S+$`)
-	if wwRe.MatchString(template[len(template)-2:]) {
-		template = whitespaceRe2.ReplaceAllString(template, "")
-	} else {
-		template = strings.TrimRight(template, " \t\n")
-	}
-
-	if len(template+morestr) > L {
-		return s
-	}
-	return s[0:len(template)] + morestr
-}
-
+// func Truncate(s, morestr string, n int) string {
+// 	L := len(s)
+// 	if L <= n {
+// 		return s
+// 	}
+//
+// 	if morestr == "" {
+// 		morestr = "..."
+// 	}
+//
+// 	tmpl := func(c string) string {
+// 		if strings.ToUpper(c) != strings.ToLower(c) {
+// 			return "A"
+// 		}
+// 		return " "
+// 	}
+// 	template := s[0 : n+1]
+// 	var truncateRe = regexp.MustCompile(`.(?=\W*\w*$)`)
+// 	truncateRe.ReplaceAllStringFunc(template, tmpl) // 'Hello, world' -> 'HellAA AAAAA'
+// 	var wwRe = regexp.MustCompile(`\w\w`)
+// 	var whitespaceRe2 = regexp.MustCompile(`\s*\S+$`)
+// 	if wwRe.MatchString(template[len(template)-2:]) {
+// 		template = whitespaceRe2.ReplaceAllString(template, "")
+// 	} else {
+// 		template = strings.TrimRight(template, " \t\n")
+// 	}
+//
+// 	if len(template+morestr) > L {
+// 		return s
+// 	}
+// 	return s[0:len(template)] + morestr
+// }
+//
 //     truncate: function(length, pruneStr) { //from underscore.string, author: github.com/rwz
 //       var str = this.s;
 //
