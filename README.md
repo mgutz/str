@@ -3,23 +3,19 @@
     import "github.com/mgutz/str"
 
 Package str is a comprehensive set of string functions to build more Go
-awesomeness. Str is a port of the JavaScript [string.js](http://stringjs.com)
-including my contributions to the project.
+awesomeness. Str complements Go's standard packages and does not duplicate
+functionality found in `strings` or `strconv`.
 
-Str does not duplicate functionality found in `strings` or `strconv`. Str may
-add filter versions of functions found in those packages for use with Pipe.
-
-Str is based on plain functions instead of object-based methods to be more
-consistent with Go standard libraries.
+Str is based on plain functions instead of object-based methods, consistent with
+Go standard string packages.
 
     str.Between("<a>foo</a>", "<a>", "</a>") == "foo"
 
-Str is designed to be pipelined.
+Str supports pipelining instead of chaining
 
     s := str.Pipe("\nabcdef\n", Clean, BetweenF("a", "f"), ChompLeftF("bc"))
-    s == "de"
 
-User-defined filters can be added to the pipeline by creating a function or
+User-defined filters can be added to the pipeline by inserting a function or
 closure that returns a function with this signature
 
     func(string) string
@@ -151,7 +147,7 @@ EnsureSuffix ensures s ends with suffix.
 ```go
 func EnsureSuffixF(suffix string) func(string) string
 ```
-EnsureSuffixF is the filter version of EnsureSuffix.
+EnsureSuffixF is the filter form of EnsureSuffix.
 
 #### func  EscapeHTML
 
@@ -230,7 +226,7 @@ Left returns the left substring of length n.
 ```go
 func LeftF(n int) func(string) string
 ```
-LeftF is the filter version of Left.
+LeftF is the filter form of Left.
 
 #### func  Lines
 
@@ -259,28 +255,28 @@ Match returns true if patterns matches the string
 ```go
 func Pad(s, c string, n int) string
 ```
-Pad pads string s on both sides until it has length of n.
+Pad pads string s on both sides with c until it has length of n.
 
 #### func  PadF
 
 ```go
 func PadF(c string, n int) func(string) string
 ```
-PadF is the filter version of Pad.
+PadF is the filter form of Pad.
 
 #### func  PadLeft
 
 ```go
 func PadLeft(s, c string, n int) string
 ```
-PadLeft pads string s on left side until it has length of n.
+PadLeft pads string s on left side with n until it has length of n.
 
 #### func  PadLeftF
 
 ```go
 func PadLeftF(c string, n int) func(string) string
 ```
-PadLeftF is the filter version of PadLeft.
+PadLeftF is the filter form of PadLeft.
 
 #### func  PadRight
 
@@ -294,7 +290,7 @@ PadRight pads string s on right side until it has length of n.
 ```go
 func PadRightF(c string, n int) func(string) string
 ```
-PadRightF is the filter version of Padright
+PadRightF is the filter form of Padright
 
 #### func  Pipe
 
@@ -315,7 +311,7 @@ QuoteItems quotes all items in array, mostly for debugging.
 ```go
 func ReplaceF(old, new string, n int) func(string) string
 ```
-ReplaceF is the filter version of strings.Replace.
+ReplaceF is the filter form of strings.Replace.
 
 #### func  ReplacePattern
 
@@ -332,7 +328,7 @@ text of the first submatch.
 ```go
 func ReplacePatternF(pattern, repl string) func(string) string
 ```
-ReplacePatternF is the filter version of ReplaceRegexp.
+ReplacePatternF is the filter form of ReplaceRegexp.
 
 #### func  Reverse
 
@@ -411,7 +407,7 @@ Substr returns a substring of s starting at index of length n.
 ```go
 func SubstrF(index, n int) func(string) string
 ```
-SubstrF is the filter version of Substr.
+SubstrF is the filter form of Substr.
 
 #### func  Template
 
@@ -443,7 +439,7 @@ closing delimiters.
 ```go
 func ToArgv(s string) []string
 ```
-ToArgv converts a s into an argv for exec.
+ToArgv converts string s into an argv for exec.
 
 #### func  ToBool
 
@@ -479,4 +475,4 @@ WrapHTML wraps s within HTML tag having attributes attrs.
 ```go
 func WrapHTMLF(tag string, attrs map[string]string) func(string) string
 ```
-WrapHTMLF is the filter version of WrapHTML
+WrapHTMLF is the filter form of WrapHTML.

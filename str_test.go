@@ -432,6 +432,24 @@ func ExampleReverse() {
 	// 2: 文中
 }
 
+func ExampleRight() {
+	eg(1, Right("abcdef", 0))
+	eg(2, Right("abcdef", 1))
+	eg(3, Right("abcdef", 4))
+	eg(4, Right("abcdef", -2))
+	// Output:
+	// 1:
+	// 2: f
+	// 3: cdef
+	// 4: ab
+}
+
+func ExampleRightF() {
+	eg(1, Pipe("abcdef", RightF(3)))
+	// Output:
+	// 1: def
+}
+
 func ExampleTemplateWithDelimiters() {
 	eg(1, TemplateWithDelimiters("Hello {{name}} at {{date-year}}", map[string]interface{}{"name": "foo", "date-year": 2014}, "{{", "}}"))
 	eg(2, TemplateWithDelimiters("Hello #{name} at #{date-year}", map[string]interface{}{"name": "foo", "date-year": 2014}, "#{", "}"))
