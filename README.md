@@ -1,5 +1,7 @@
 # str
---
+
+[godoc](https://godoc.org/github.com/mgutz/str)
+
     import "github.com/mgutz/str"
 
 Package str is a comprehensive set of string functions to build more Go
@@ -269,7 +271,7 @@ PadF is the filter form of Pad.
 ```go
 func PadLeft(s, c string, n int) string
 ```
-PadLeft pads string s on left side with n until it has length of n.
+PadLeft pads s on left side with c until it has length of n.
 
 #### func  PadLeftF
 
@@ -283,7 +285,7 @@ PadLeftF is the filter form of PadLeft.
 ```go
 func PadRight(s, c string, n int) string
 ```
-PadRight pads string s on right side until it has length of n.
+PadRight pads s on right side with c until it has length of n.
 
 #### func  PadRightF
 
@@ -468,7 +470,8 @@ UnescapeHTML is an alias for html.UnescapeString.
 ```go
 func WrapHTML(s string, tag string, attrs map[string]string) string
 ```
-WrapHTML wraps s within HTML tag having attributes attrs.
+WrapHTML wraps s within HTML tag having attributes attrs. Note, WrapHTML does
+not escape s value.
 
 #### func  WrapHTMLF
 

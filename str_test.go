@@ -55,10 +55,18 @@ func ExampleCapitalize() {
 
 func ExampleCharAt() {
 	eg(1, CharAt("abc", 1))
-	eg(2, "foo"+CharAt("", -1)+CharAt("", 0)+CharAt("", 10)+CharAt("abc", -1)+CharAt("abc", 10)+"bar")
+	eg(2, CharAt("", -1))
+	eg(3, CharAt("", 0))
+	eg(4, CharAt("", 10))
+	eg(5, CharAt("abc", -1))
+	eg(6, CharAt("abc", 10))
 	// Output:
 	// 1: b
-	// 2: foobar
+	// 2:
+	// 3:
+	// 4:
+	// 5:
+	// 6:
 }
 
 func ExampleCharAtF() {
@@ -72,11 +80,13 @@ func ExampleChompLeft() {
 	eg(2, ChompLeft("foobar", "bar"))
 	eg(3, ChompLeft("", "foo"))
 	eg(4, ChompLeft("", ""))
+	eg(5, ChompLeft("foo", ""))
 	// Output:
 	// 1: bar
 	// 2: foobar
 	// 3:
 	// 4:
+	// 5: foo
 }
 
 func ExampleChompLeftF() {

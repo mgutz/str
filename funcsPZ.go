@@ -32,7 +32,7 @@ func PadF(c string, n int) func(string) string {
 	}
 }
 
-// PadLeft pads string s on left side with n until it has length of n.
+// PadLeft pads s on left side with c until it has length of n.
 func PadLeft(s, c string, n int) string {
 	L := len(s)
 	if L > n {
@@ -48,13 +48,13 @@ func PadLeftF(c string, n int) func(string) string {
 	}
 }
 
-// PadRight pads string s on right side until it has length of n.
+// PadRight pads s on right side with c until it has length of n.
 func PadRight(s, c string, n int) string {
 	L := len(s)
 	if L > n {
 		return s
 	}
-	return s + strings.Repeat(c, (n-L))
+	return s + strings.Repeat(c, n-L)
 }
 
 // PadRightF is the filter form of Padright
@@ -434,7 +434,8 @@ func UnescapeHTML(s string) string {
 	return html.UnescapeString(s)
 }
 
-// WrapHTML wraps s within HTML tag having attributes attrs.
+// WrapHTML wraps s within HTML tag having attributes attrs. Note,
+// WrapHTML does not escape s value.
 func WrapHTML(s string, tag string, attrs map[string]string) string {
 	escapeHTMLAttributeQuotes := func(v string) string {
 		v = strings.Replace(v, "<", "&lt;", -1)
