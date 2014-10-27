@@ -126,6 +126,11 @@ func RightF(n int) func(string) string {
 	}
 }
 
+// RightOf returns the substring to the right of prefix.
+func RightOf(s string, prefix string) string {
+	return Between(s, prefix, "")
+}
+
 // SetTemplateDelimiters sets the delimiters for Template function. Defaults to "{{" and "}}"
 func SetTemplateDelimiters(opening, closing string) {
 	templateOpen = opening
@@ -352,6 +357,45 @@ func ToBool(s string) bool {
 	s = strings.ToLower(s)
 	return s == "true" || s == "yes" || s == "on" || s == "1"
 }
+
+// ToBoolOr parses s as a bool or returns defaultValue.
+func ToBoolOr(s string, defaultValue bool) bool {
+	b, err := strconv.ParseBool(s)
+	if err != nil {
+		return defaultValue
+	}
+	return b
+}
+
+// ToIntOr parses s as an int or returns defaultValue.
+func ToIntOr(s string, defaultValue int) int {
+	n, err := strconv.Atoi(s)
+	if err != nil {
+		return defaultValue
+	}
+	return n
+}
+
+// ToFloat32Or parses as a float32 or returns defaultValue on error.
+func ToFloat32Or(s string, defaultValue float32) float32 {
+	f, err := strconv.ParseFloat(s, 32)
+	if err != nil {
+		return defaultValue
+	}
+	return float32(f)
+}
+
+// ToFloat64Or parses s as a float64 or returns defaultValue.
+func ToFloat64Or(s string, defaultValue float64) float64 {
+	f, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return defaultValue
+	}
+	return f
+}
+
+// ToFloatOr parses as a float64 or returns defaultValue.
+var ToFloatOr = ToFloat64Or
 
 // TODO This is not working yet. Go's regexp package does not have some
 // of the niceities in JavaScript

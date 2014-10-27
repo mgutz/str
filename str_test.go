@@ -113,6 +113,20 @@ func ExampleChompRightF() {
 	// 1: a
 }
 
+func ExampleClassify() {
+	eg(1, Classify("data_rate"))
+	eg(2, Classify("background-color"))
+	eg(3, Classify("-moz-something"))
+	eg(4, Classify("_car_speed_"))
+	eg(5, Classify("yes_we_can"))
+	// Output:
+	// 1: DataRate
+	// 2: BackgroundColor
+	// 3: MozSomething
+	// 4: CarSpeed
+	// 5: YesWeCan
+}
+
 func ExampleClean() {
 	eg(1, Clean("clean"))
 	eg(2, Clean(""))
@@ -189,6 +203,14 @@ func ExampleHumanize() {
 	// 1: The humanize string method
 	// 2: Thehumanize string method
 	// 3: The humanize string method
+}
+
+func ExampleIif() {
+	eg(1, Iif(true, "T", "F"))
+	eg(2, Iif(false, "T", "F"))
+	// Output:
+	// 1: T
+	// 2: F
 }
 
 func ExampleIndexOf() {
@@ -346,6 +368,20 @@ func ExampleLeft() {
 	// 4: ef
 }
 
+func ExampleLeftOf() {
+	eg(1, LeftOf("abcdef", "def"))
+	eg(2, LeftOf("abcdef", "abc"))
+	eg(3, LeftOf("abcdef", ""))
+	eg(4, LeftOf("", "abc"))
+	eg(5, LeftOf("abcdef", "xyz"))
+	// Output:
+	// 1: abc
+	// 2:
+	// 3: abcdef
+	// 4:
+	// 5:
+}
+
 func ExampleLines() {
 	eg(1, Lines("a\r\nb\nc\r\n"))
 	eg(2, Lines("a\r\nb\nc\r\nd"))
@@ -454,37 +490,24 @@ func ExampleRight() {
 	// 4: ab
 }
 
+func ExampleRightOf() {
+	eg(1, RightOf("abcdef", "abc"))
+	eg(2, RightOf("abcdef", "def"))
+	eg(3, RightOf("abcdef", ""))
+	eg(4, RightOf("", "abc"))
+	eg(5, RightOf("abcdef", "xyz"))
+	// Output:
+	// 1: def
+	// 2:
+	// 3: abcdef
+	// 4:
+	// 5:
+}
+
 func ExampleRightF() {
 	eg(1, Pipe("abcdef", RightF(3)))
 	// Output:
 	// 1: def
-}
-
-func ExampleTemplateWithDelimiters() {
-	eg(1, TemplateWithDelimiters("Hello {{name}} at {{date-year}}", map[string]interface{}{"name": "foo", "date-year": 2014}, "{{", "}}"))
-	eg(2, TemplateWithDelimiters("Hello #{name} at #{date-year}", map[string]interface{}{"name": "foo", "date-year": 2014}, "#{", "}"))
-	eg(3, TemplateWithDelimiters("Hello (name) at (date-year)", map[string]interface{}{"name": "foo", "date-year": 2014}, "(", ")"))
-	eg(4, TemplateWithDelimiters("Hello [name] at [date-year]", map[string]interface{}{"name": "foo", "date-year": 2014}, "[", "]"))
-	eg(5, TemplateWithDelimiters("Hello *name* at *date-year*", map[string]interface{}{"name": "foo", "date-year": 2014}, "*", "*"))
-	eg(6, TemplateWithDelimiters("Hello $name$ at $date-year$", map[string]interface{}{"name": "foo", "date-year": 2014}, "$", "$"))
-	// Output:
-	// 1: Hello foo at 2014
-	// 2: Hello foo at 2014
-	// 3: Hello foo at 2014
-	// 4: Hello foo at 2014
-	// 5: Hello foo at 2014
-	// 6: Hello foo at 2014
-}
-
-func ExampleTemplate() {
-	eg(1, Template("Hello {{name}} at {{date-year}}", map[string]interface{}{"name": "foo", "date-year": 2014}))
-	eg(2, Template("Hello {{name}}", map[string]interface{}{"name": ""}))
-	SetTemplateDelimiters("{", "}")
-	eg(3, Template("Hello {name} at {date-year}", map[string]interface{}{"name": "foo", "date-year": 2014}))
-	// Output:
-	// 1: Hello foo at 2014
-	// 2: Hello
-	// 3: Hello foo at 2014
 }
 
 func ExampleSlugify() {
@@ -533,6 +556,33 @@ func ExampleSubstr() {
 	// 7: a
 }
 
+func ExampleTemplateWithDelimiters() {
+	eg(1, TemplateWithDelimiters("Hello {{name}} at {{date-year}}", map[string]interface{}{"name": "foo", "date-year": 2014}, "{{", "}}"))
+	eg(2, TemplateWithDelimiters("Hello #{name} at #{date-year}", map[string]interface{}{"name": "foo", "date-year": 2014}, "#{", "}"))
+	eg(3, TemplateWithDelimiters("Hello (name) at (date-year)", map[string]interface{}{"name": "foo", "date-year": 2014}, "(", ")"))
+	eg(4, TemplateWithDelimiters("Hello [name] at [date-year]", map[string]interface{}{"name": "foo", "date-year": 2014}, "[", "]"))
+	eg(5, TemplateWithDelimiters("Hello *name* at *date-year*", map[string]interface{}{"name": "foo", "date-year": 2014}, "*", "*"))
+	eg(6, TemplateWithDelimiters("Hello $name$ at $date-year$", map[string]interface{}{"name": "foo", "date-year": 2014}, "$", "$"))
+	// Output:
+	// 1: Hello foo at 2014
+	// 2: Hello foo at 2014
+	// 3: Hello foo at 2014
+	// 4: Hello foo at 2014
+	// 5: Hello foo at 2014
+	// 6: Hello foo at 2014
+}
+
+func ExampleTemplate() {
+	eg(1, Template("Hello {{name}} at {{date-year}}", map[string]interface{}{"name": "foo", "date-year": 2014}))
+	eg(2, Template("Hello {{name}}", map[string]interface{}{"name": ""}))
+	SetTemplateDelimiters("{", "}")
+	eg(3, Template("Hello {name} at {date-year}", map[string]interface{}{"name": "foo", "date-year": 2014}))
+	// Output:
+	// 1: Hello foo at 2014
+	// 2: Hello
+	// 3: Hello foo at 2014
+}
+
 func ExampleToArgv() {
 	eg(1, QuoteItems(ToArgv(`GO_ENV=test gosu --watch foo@release "some quoted string 'inside'"`)))
 	eg(2, QuoteItems(ToArgv(`gosu foo\ bar`)))
@@ -565,6 +615,30 @@ func ExampleToBool() {
 	// 8: false
 	// 9: false
 	// 10: false
+}
+
+func ExampleToBoolOr() {
+	eg(1, ToBoolOr("foo", true))
+	eg(2, ToBoolOr("foo", false))
+	eg(3, ToBoolOr("true", false))
+	eg(4, ToBoolOr("", true))
+	// Output:
+	// 1: true
+	// 2: false
+	// 3: true
+	// 4: true
+}
+
+func ExampleToIntOr() {
+	eg(1, ToIntOr("foo", 0))
+	eg(2, ToIntOr("", 1))
+	eg(3, ToIntOr("100", 0))
+	eg(4, ToIntOr("-1", 1))
+	// Output:
+	// 1: 0
+	// 2: 1
+	// 3: 100
+	// 4: -1
 }
 
 func ExampleUnderscore() {

@@ -51,6 +51,9 @@ func max(a, b int) int {
 func Between(s, left, right string) string {
 	l := len(left)
 	startPos := strings.Index(s, left)
+	if startPos < 0 {
+		return ""
+	}
 	endPos := IndexOf(s, right, startPos+l)
 	//log.Printf("%s: left %s right %s start %d end %d", s, left, right, startPos+l, endPos)
 	if endPos < 0 {
@@ -127,6 +130,18 @@ func ChompRight(s, suffix string) string {
 func ChompRightF(suffix string) func(string) string {
 	return func(s string) string {
 		return ChompRight(s, suffix)
+	}
+}
+
+// Classify returns a camelized string with the first letter upper cased.
+func Classify(s string) string {
+	return Camelize("-" + s)
+}
+
+// ClassifyF is the filter form of Classify.
+func ClassifyF(s string) func(string) string {
+	return func(s string) string {
+		return Classify(s)
 	}
 }
 
@@ -208,6 +223,14 @@ func Humanize(s string) string {
 	return s
 }
 
+// Iif is short for immediate if. If condition is true return truthy else falsey.
+func Iif(condition bool, truthy string, falsey string) string {
+	if condition {
+		return truthy
+	}
+	return falsey
+}
+
 // IndexOf finds the index of needle in s starting from start.
 func IndexOf(s string, needle string, start int) int {
 	l := len(s)
@@ -276,6 +299,20 @@ func LeftF(n int) func(string) string {
 	return func(s string) string {
 		return Left(s, n)
 	}
+}
+
+// LeftOf returns the substring left of needle.
+func LeftOf(s string, needle string) string {
+	return Between(s, "", needle)
+}
+
+// Letters returns an array of runes as strings so it can be indexed into.
+func Letters(s string) []string {
+	result := []string{}
+	for _, r := range s {
+		result = append(result, string(r))
+	}
+	return result
 }
 
 // Lines convert windows newlines to unix newlines then convert to an Array of lines.
