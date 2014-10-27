@@ -1,30 +1,30 @@
-package tasks
+package main
 
 import (
 	"github.com/mgutz/goa"
 	f "github.com/mgutz/goa/filter"
-	"github.com/mgutz/gosu"
+	. "github.com/mgutz/gosu"
 	"github.com/mgutz/gosu/util"
 	"github.com/mgutz/str"
 )
 
 // Project is local project.
-func Project(p *gosu.Project) {
-	p.Task("default", []string{"readme"})
+func Tasks(p *Project) {
+	p.Task("default", D{"readme"})
 
 	p.Task("install", func() {
-		util.Exec("go get github.com/robertkrimen/godocdown/godocdown")
+		Run("go get github.com/robertkrimen/godocdown/godocdown")
 	})
 
 	p.Task("lint", func() {
-		util.Exec("golint .")
-		util.Exec("gofmt -w -s .")
-		util.Exec("go vet .")
-		util.Exec("go test")
+		Run("golint .")
+		Run("gofmt -w -s .")
+		Run("go vet .")
+		Run("go test")
 	})
 
-	p.Task("readme", gosu.Files{"**/*.go"}, func() {
-		util.Exec("godocdown -output README.md")
+	p.Task("readme", W{"**/*.go"}, func() {
+		Run("godocdown -output README.md")
 
 		packageName, _ := util.PackageName("doc.go")
 
@@ -35,4 +35,8 @@ func Project(p *gosu.Project) {
 			f.Write(),
 		)
 	})
+}
+
+func main() {
+	Gosu(Tasks)
 }

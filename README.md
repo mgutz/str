@@ -25,6 +25,11 @@ closure that returns a function with this signature
 ## Usage
 
 ```go
+var ToFloatOr = ToFloat64Or
+```
+ToFloatOr parses as a float64 or returns defaultValue.
+
+```go
 var Verbose = false
 ```
 Verbose flag enables console output for those functions that have counterparts
@@ -101,6 +106,20 @@ func ChompRightF(suffix string) func(string) string
 ```
 ChompRightF is the filter form of ChompRight.
 
+#### func  Classify
+
+```go
+func Classify(s string) string
+```
+Classify returns a camelized string with the first letter upper cased.
+
+#### func  ClassifyF
+
+```go
+func ClassifyF(s string) func(string) string
+```
+ClassifyF is the filter form of Classify.
+
 #### func  Clean
 
 ```go
@@ -164,6 +183,13 @@ EscapeHTML is alias for html.EscapeString.
 func Humanize(s string) string
 ```
 Humanize transforms s into a human friendly form.
+
+#### func  Iif
+
+```go
+func Iif(condition bool, truthy string, falsey string) string
+```
+Iif is short for immediate if. If condition is true return truthy else falsey.
 
 #### func  IndexOf
 
@@ -229,6 +255,20 @@ Left returns the left substring of length n.
 func LeftF(n int) func(string) string
 ```
 LeftF is the filter form of Left.
+
+#### func  LeftOf
+
+```go
+func LeftOf(s string, needle string) string
+```
+LeftOf returns the substring left of needle.
+
+#### func  Letters
+
+```go
+func Letters(s string) []string
+```
+Letters returns an array of runes as strings so it can be indexed into.
 
 #### func  Lines
 
@@ -353,6 +393,13 @@ func RightF(n int) func(string) string
 ```
 RightF is the Filter version of Right.
 
+#### func  RightOf
+
+```go
+func RightOf(s string, prefix string) string
+```
+RightOf returns the substring to the right of prefix.
+
 #### func  SetTemplateDelimiters
 
 ```go
@@ -449,6 +496,34 @@ ToArgv converts string s into an argv for exec.
 func ToBool(s string) bool
 ```
 ToBool fuzzily converts truthy values.
+
+#### func  ToBoolOr
+
+```go
+func ToBoolOr(s string, defaultValue bool) bool
+```
+ToBoolOr parses s as a bool or returns defaultValue.
+
+#### func  ToFloat32Or
+
+```go
+func ToFloat32Or(s string, defaultValue float32) float32
+```
+ToFloat32Or parses as a float32 or returns defaultValue on error.
+
+#### func  ToFloat64Or
+
+```go
+func ToFloat64Or(s string, defaultValue float64) float64
+```
+ToFloat64Or parses s as a float64 or returns defaultValue.
+
+#### func  ToIntOr
+
+```go
+func ToIntOr(s string, defaultValue int) int
+```
+ToIntOr parses s as an int or returns defaultValue.
 
 #### func  Underscore
 
