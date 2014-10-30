@@ -510,6 +510,32 @@ func ExampleRightF() {
 	// 1: def
 }
 
+func ExampleSliceContains() {
+	eg(1, SliceContains([]string{"foo", "bar"}, "foo"))
+	eg(2, SliceContains(nil, "foo"))
+	eg(3, SliceContains([]string{"foo", "bar"}, "bah"))
+	eg(4, SliceContains([]string{"foo", "bar"}, ""))
+	// Output:
+	// 1: true
+	// 2: false
+	// 3: false
+	// 4: false
+}
+
+func ExampleSliceIndexOf() {
+	eg(1, SliceIndexOf([]string{"foo", "bar"}, "foo"))
+	eg(2, SliceIndexOf(nil, "foo"))
+	eg(3, SliceIndexOf([]string{"foo", "bar"}, "bah"))
+	eg(4, SliceIndexOf([]string{"foo", "bar"}, ""))
+	eg(5, SliceIndexOf([]string{"foo", "bar"}, "bar"))
+	// Output:
+	// 1: 0
+	// 2: -1
+	// 3: -1
+	// 4: -1
+	// 5: 1
+}
+
 func ExampleSlugify() {
 	eg(1, Slugify("foo bar"))
 	eg(2, Slugify("foo/bar bah"))

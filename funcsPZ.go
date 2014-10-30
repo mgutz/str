@@ -157,27 +157,32 @@ func SliceF(start, end int) func(string) string {
 	}
 }
 
-// Substr returns a substring of s starting at index of length n.
-func Substr(s string, index int, n int) string {
-	L := len(s)
-	if index < 0 || index >= L || s == "" {
-		return ""
+// SliceContains determines whether val is an element in slice.
+func SliceContains(slice []string, val string) bool {
+	if slice == nil {
+		return false
 	}
-	end := index + n
-	if end >= L {
-		end = L
+
+	for _, it := range slice {
+		if it == val {
+			return true
+		}
 	}
-	if end <= index {
-		return ""
-	}
-	return s[index:end]
+	return false
 }
 
-// SubstrF is the filter form of Substr.
-func SubstrF(index, n int) func(string) string {
-	return func(s string) string {
-		return Substr(s, index, n)
+// SliceIndexOf gets the indx of val in slice. Returns -1 if not found.
+func SliceIndexOf(slice []string, val string) int {
+	if slice == nil {
+		return -1
 	}
+
+	for i, it := range slice {
+		if it == val {
+			return i
+		}
+	}
+	return -1
 }
 
 // Slugify converts s into a dasherized string suitable for URL segment.
@@ -205,6 +210,29 @@ func StripTags(s string, tags ...string) string {
 		s = stripTagsRe.ReplaceAllString(s, "")
 	}
 	return s
+}
+
+// Substr returns a substring of s starting at index of length n.
+func Substr(s string, index int, n int) string {
+	L := len(s)
+	if index < 0 || index >= L || s == "" {
+		return ""
+	}
+	end := index + n
+	if end >= L {
+		end = L
+	}
+	if end <= index {
+		return ""
+	}
+	return s[index:end]
+}
+
+// SubstrF is the filter form of Substr.
+func SubstrF(index, n int) func(string) string {
+	return func(s string) string {
+		return Substr(s, index, n)
+	}
 }
 
 // Template is a string template which replaces template placeholders delimited
