@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/mgutz/goa"
 	f "github.com/mgutz/goa/filter"
-	. "github.com/mgutz/gosu"
-	"github.com/mgutz/gosu/util"
+	. "github.com/mgutz/godo"
+	"github.com/mgutz/godo/util"
 	"github.com/mgutz/str"
 )
 
@@ -38,5 +38,5 @@ func Tasks(p *Project) {
 }
 
 func main() {
-	Gosu(Tasks)
+	Godo(Tasks)
 }
