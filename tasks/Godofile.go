@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/mgutz/goa"
 	f "github.com/mgutz/goa/filter"
-	. "github.com/mgutz/godo"
-	"github.com/mgutz/godo/util"
+	. "github.com/go-godo/godo"
+	"github.com/go-godo/godo/util"
 	"github.com/mgutz/str"
 )
 
