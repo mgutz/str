@@ -375,7 +375,7 @@ func ToArgv(s string) ([]string, error) {
 	if currentState == InArg {
 		argv = append(argv, currentArg)
 	} else if currentState == InArgQuote {
-		return nil, errors.new("Starting quote has no ending quote")
+		return nil, errors.New("Starting quote has no ending quote")
 	}
 
 	return argv, nil
