@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"unicode/utf8"
+	"errors"
 )
 
 // Pad pads string s on both sides with c until it has length of n.
@@ -272,7 +273,7 @@ func TemplateWithDelimiters(s string, values map[string]interface{}, opening, cl
 }
 
 // ToArgv converts string s into an argv for exec.
-func ToArgv(s string) []string {
+func ToArgv(s string) ([]string, error) {
 	const (
 		InArg = iota
 		InArgQuote
@@ -343,7 +344,7 @@ func ToArgv(s string) []string {
 						// just add \ to end for windows
 						currentArg += c
 					} else {
-						panic("Escape character at end string")
+						return nil, errors.New("Escape character at end of string")
 					}
 				} else {
 					if runtime.GOOS == "windows" {
@@ -374,10 +375,10 @@ func ToArgv(s string) []string {
 	if currentState == InArg {
 		argv = append(argv, currentArg)
 	} else if currentState == InArgQuote {
-		panic("Starting quote has no ending quote.")
+		return nil, errors.new("Starting quote has no ending quote")
 	}
 
-	return argv
+	return argv, nil
 }
 
 // ToBool fuzzily converts truthy values.
